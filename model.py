@@ -1,7 +1,9 @@
 import tkinter as tk
+import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as mpla
 
-DELAY = 250
+L_STEP = 0.05
 
 ### SYSTEM VARIABLES
 SYS = {
@@ -13,7 +15,7 @@ SYS = {
     "ALBEDO_WHITE" : 0.75,
     "ALBEDO_GROUND" : 0.5,
     "ALBEDO_BLACK" : 0.25,
-    "MAX_DAYS" : 100000,
+    "MAX_DAYS" : 5000,
     "DAY" : 1, 
     "GAMMA" : 0.3,
     "AREA_WHITE" : 0.01,
@@ -40,7 +42,9 @@ def local_temp(daisy_type):
     if (daisy_type == "white"):
         A = SYS["ALBEDO_WHITE"]   
 
-    return (SYS["q"] * (calc_albedo() - A) + temp_e**4)**0.25
+    temp_i = (SYS["q"] * (calc_albedo() - A) + temp_e**4)**0.25
+
+    return temp_i 
 
 def calc_betta(daisy_type):
     temp_i = local_temp(daisy_type)
@@ -58,11 +62,8 @@ def calc_dw(daisy_type):
     return dw
 
 def update_day():
-   #print(f"--- DAY {SYS["DAY"]} L {SYS["L"]} ---")
     dw_white = calc_dw("white")
     dw_black = calc_dw("black")
-    #print(f"white: {SYS["AREA_WHITE"]} dw: {dw_white}")
-    #print(f"black: {SYS["AREA_BLACK"]} dw: {dw_black}\n")
 
     SYS["AREA_WHITE"] += dw_white
     SYS["AREA_BLACK"] += dw_black
@@ -72,50 +73,57 @@ def update_day():
     if SYS["AREA_BLACK"] <= 0:
         SYS["AREA_BLACK"] = 0
 
+### GUI
 
 ### SIMULATION
+
 temp_data = []
 black_data = []
 white_data = []
 L_data = []
+black_temp = []
+white_temp = []
+
 
 while SYS["L"] < 1.7:
-    #print("\n--------------------------- NEW L ---------------------------")
     while SYS["DAY"] < SYS["MAX_DAYS"]:
         update_day()
         SYS["DAY"] += 1
     
-    #print(f"RESULT: day: {SYS["DAY"]} L:{ SYS["L"]} black:{SYS["AREA_BLACK"]} white:{SYS["AREA_WHITE"]}% temp:{earth_temp()-273}C")
-
-    black_data.append(SYS["AREA_BLACK"])
-    white_data.append(SYS["AREA_WHITE"])
+    black_data.append(SYS["AREA_BLACK"]*100)
+    white_data.append(SYS["AREA_WHITE"]*100)
     temp_data.append(earth_temp()-273)
     L_data.append(SYS["L"])
-    
+    white_temp.append(local_temp("white") - 273)
+    black_temp.append(local_temp("black") - 273)
+
     SYS["DAY"] = 0
     if SYS["AREA_WHITE"] <= 0:
         SYS["AREA_WHITE"] = 0.01
     if SYS["AREA_BLACK"] <= 0:
         SYS["AREA_BLACK"] = 0.01
-    #print(f"BEFORE NEW L: black: {SYS["AREA_BLACK"]} white: {SYS["AREA_WHITE"]}")
-    SYS["L"] = round(SYS["L"] + 0.05 ,3)
 
-plt.figure()  # Optional: set figure size
-
-plt.plot(L_data, white_data, marker='o', linestyle='-', color='r', label='white')
-plt.plot(L_data, black_data, marker='o', linestyle='-', color='b', label='black')
+    SYS["L"] = round(SYS["L"] + L_STEP ,3) # upade L to next simulation
 
 
-# Adding labels and title
-plt.xlabel('L')
-plt.ylabel('Temp')
-plt.title('Simple Line Plot')
+fig, axis = plt.subplots(1, 2, figsize=(12, 6))
 
-# Adding grid
-plt.grid(True)
+# Plot data in the first subplot
+axis[0].plot(L_data, white_data, marker='o', linestyle='-', color='r', label='white')
+axis[0].plot(L_data, black_data, marker='o', linestyle='-', color='b', label='black')
+axis[0].set_title("Area")
+axis[0].set_xlabel('Luminosity')
+axis[0].set_ylabel('Area Percentage')
+axis[0].grid(True)
+axis[0].legend()
 
-# Adding legend
-plt.legend()
 
-# Display the plot
+axis[1].plot(L_data, white_temp, marker='o', linestyle='-', color='r', label='White Temperture')
+axis[1].plot(L_data, black_temp, marker='o', linestyle='-', color='b', label='Black Temperture')
+axis[1].set_title("Temperture")
+axis[1].set_xlabel('Luminosity')
+axis[1].set_ylabel('Temperture')
+axis[1].grid(True)
+axis[1].legend()
+
 plt.show()
