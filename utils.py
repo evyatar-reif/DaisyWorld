@@ -40,7 +40,9 @@ def local_temp(daisy, daisies, L):
 
 def calc_betta(daisy, daisies, L):
     temp_i = local_temp(daisy, daisies, L)
-    betta = 1 - 0.003265 * (295.5 - temp_i)**2
+    daisy.update_temp(temp_i)
+
+    betta = 1 - 0.003265 * (273 + daisy.optimal_temp - temp_i) ** 2
     
     return betta
 
