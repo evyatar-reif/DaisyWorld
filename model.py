@@ -88,11 +88,9 @@ START_L = 0.6
 L_STEP = 0.05
 DEFAULT_AREA = 0.01
 
-white = Daisy("white", 0.75,'blue', DEFAULT_AREA, 27.5)
-black = Daisy("black", 0.25,'orange', DEFAULT_AREA, 17.5)
+white = Daisy("white", 0.75,'blue', DEFAULT_AREA)
+black = Daisy("black", 0.25,'orange', DEFAULT_AREA)
 gray = Daisy("gray", 0.5,'gray', DEFAULT_AREA)
-purple = Daisy("purple", 0.4,'purple', DEFAULT_AREA)
-green = Daisy("green", 0.6,'green', DEFAULT_AREA)
 
 daisies = [black, white]
 
