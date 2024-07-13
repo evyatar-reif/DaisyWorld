@@ -94,7 +94,7 @@ gray = Daisy("gray", 0.5,'gray', DEFAULT_AREA)
 purple = Daisy("purple", 0.4,'purple', DEFAULT_AREA)
 green = Daisy("green", 0.6,'green', DEFAULT_AREA)
 
-daisies = [black,white]
+daisies = [black, white]
 
 temp_data = []
 l_data = []
